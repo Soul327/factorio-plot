@@ -4,6 +4,7 @@ import hashlib
 from datetime import datetime
 from PIL import Image, ImageDraw
 import time
+import argparse
 
 class LoadingManager:
 	def __init__(self, text):
@@ -32,6 +33,7 @@ class LoadingManager:
 	def stop(self):
 		self.isLoading = False
 		self.thread.join()
+
 
 def drawSurface(surfaceName, localSurfaceConfig):
 	"""
@@ -624,7 +626,30 @@ def getFileHash(filePath):
 					
 	return func.hexdigest()
 
+def processCommand():
+	# Initialize parser
+	parser = argparse.ArgumentParser()
 
+	# Adding optional argument
+	parser.add_argument("-i", "--input-path" , help = "The Factorio save input file")
+	parser.add_argument("-o", "--output-path", help = "Sets the output directory for the image files")
+
+	# Read arguments from command line
+	args = parser.parse_args()
+
+	if args.input_path:
+		directory = os.path.dirname(args.input_path)
+		filename = os.path.basename(args.input_path)
+
+		# Remove .zip
+		if filename[-4:] == ".zip":
+			filename = filename[:-4]
+		
+		configOverride["factorio-save-path"] = directory
+		configOverride["factorio-save-name"] = filename
+
+	if args.output_path:
+		configOverride["backgrounds-folder"] = args.output_path
 
 """ MAIN ENTRY """
 startTime = time.time()
@@ -633,7 +658,9 @@ debug = False
 running = True
 jobs = [] # Stored jobs for the worker thread
 outputFiles = [] # Paths to the output images
+configOverride = {} # Overrides for the config file set by the commands
 
+processCommand()
 
 # Load our general config file
 if os.path.exists('config.yaml') == False:
@@ -641,6 +668,9 @@ if os.path.exists('config.yaml') == False:
 
 with open('config.yaml', 'r') as f:
 	config = yaml.safe_load(f)
+config = {**config, **configOverride}
+
+print(config)
 
 if "auto-generated" in config and config["auto-generated"] == True:
 	print("Please verify in config.yaml that the settings are correct. Then change auto-generated to False and run again.")
