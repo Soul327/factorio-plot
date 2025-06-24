@@ -5,6 +5,7 @@ from datetime import datetime
 from PIL import Image, ImageDraw
 import time
 import argparse
+import platform
 
 class LoadingManager:
 	def __init__(self, text):
@@ -552,6 +553,27 @@ def startServer():
 
 
 """ UTILITY FUNCTIONS """
+def getRunType():
+	"""
+	Get the run type of the system.
+	Options include
+	 - windows
+	 - linux
+	 - nixos
+	 - unknown
+	"""
+	if platform.system() == "Windows":
+		return "windows"
+	
+	if platform.system() == "Linux":
+		if "NixOS" in platform.version():
+			return "nixos"
+		return "linux"
+	# print(platform.system())
+	# print(platform.version())
+	return "unknown"
+
+
 def format_string(s, **kwargs):
 	return s.format(**kwargs)
 
