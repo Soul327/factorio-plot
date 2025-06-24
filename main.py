@@ -392,31 +392,32 @@ def updateServer():
 	url = "https://factorio.com/get-download/stable/headless/linux64"  # Server download URL
 	output_path = "factorio.tar.xz"  # Server download path
 	
+	isServerUpToDate = False
 	if os.path.exists(output_path):
 		lastServerUpdate = os.stat(output_path).st_mtime
 		if time.time() - lastServerUpdate < 86400:
 			print("  Server is up to date\n")
+			isServerUpToDate = True
+
+	if isServerUpToDate == False:
+		# Download the new server
+		lm = LoadingManager("  Downloading new server...")
+		response = requests.get(url) # Send a GET request to the URL
+		if response.status_code != 200: # Check if the request was successful
+			print("Response from server {url} was unsuccessfull, the server maybe old")
 			return
+			
+		# Open the output file and write the content of the response to it
+		with open(output_path, 'wb') as f:
+			f.write(response.content)
+		lm.stop()
 
-
-	# Download the new server
-	lm = LoadingManager("  Downloading new server...")
-	response = requests.get(url) # Send a GET request to the URL
-	if response.status_code != 200: # Check if the request was successful
-		print("Response from server {url} was unsuccessfull, the server maybe old")
-		return
-		
-	# Open the output file and write the content of the response to it
-	with open(output_path, 'wb') as f:
-		f.write(response.content)
-	lm.stop()
-
-	# Delete the old server 
-	factorioServerPath = "factorio"
-	if os.path.exists(factorioServerPath) and os.path.isdir(factorioServerPath):
-		print("  Removing old server path...", end="", flush=True)
-		shutil.rmtree(factorioServerPath)
-		print(" done.")
+		# Delete the old server 
+		factorioServerPath = "factorio"
+		if os.path.exists(factorioServerPath) and os.path.isdir(factorioServerPath):
+			print("  Removing old server path...", end="", flush=True)
+			shutil.rmtree(factorioServerPath)
+			print(" done.")
 
 	# Extract the new server
 	lm = LoadingManager("  Extracting server file...")
@@ -425,7 +426,8 @@ def updateServer():
 	lm.stop()
 
 	print("  Moving mod...", end="", flush=True)
-	os.mkdir("factorio/mods")
+	if os.path.exists("factorio/mods") == False:
+		os.mkdir("factorio/mods")
 	updateMod()
 	print(" done.")
 
@@ -713,6 +715,8 @@ if os.path.exists(lrFilePath):
 	if data["save-hash"] == saveFileHash:
 		useServer = False
 
+if os.path.exists("factorio/script-output") == False:
+	useServer = True
 
 # Create our images
 print()
