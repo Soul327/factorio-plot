@@ -1,11 +1,11 @@
 import time, json, os, yaml, statistics, math, subprocess, threading, shutil, sys, platform, requests
 import tarfile
-import hashlib
 from datetime import datetime
 from PIL import Image, ImageDraw
 import time
 import argparse
 import platform
+import utils
 
 class LoadingManager:
 	def __init__(self, text):
@@ -109,7 +109,7 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	xCords, yCords = [], []
 	for entry in data["entities"]:
 		for localSurfaceConfigEntry in localSurfaceConfig["entries"]:
-			if match(entry, localSurfaceConfigEntry) == False: continue
+			if utils.match(entry, localSurfaceConfigEntry) == False: continue
 			if "flags" not in localSurfaceConfigEntry: continue
 			if "center" not in localSurfaceConfigEntry["flags"]: continue # Make sure that this preset has the center flag
 			xCords.append(entry["x"])
@@ -195,7 +195,7 @@ def drawSurface(surfaceName, localSurfaceConfig):
 
 		# imageWidth, imageHeight = int(imageWidth), int(imageHeight)
 		# print(f"    Current image size: ({imageWidth}:{imageHeight})")
-		w, h = getAspect(imageWidth, imageHeight)
+		w, h = utils.getAspect(imageWidth, imageHeight)
 		if w != expectedW and h != expectedY:
 			# Create two options
 			newWidth = imageHeight * (expectedW/expectedY)
@@ -241,7 +241,7 @@ def drawSurface(surfaceName, localSurfaceConfig):
 				if surfaceName not in localSurfaceConfigEntry["planets"]:
 					continue
 			
-			if match(entry, localSurfaceConfigEntry) == False: continue
+			if utils.match(entry, localSurfaceConfigEntry) == False: continue
 			if "size"  in localSurfaceConfigEntry: size  = localSurfaceConfigEntry["size"]
 			if "color" in localSurfaceConfigEntry: color = localSurfaceConfigEntry["color"]
 			if "style" in localSurfaceConfigEntry: style = localSurfaceConfigEntry["style"]
@@ -279,9 +279,9 @@ def drawSurface(surfaceName, localSurfaceConfig):
 	# draw.rectangle([(x, y), (x+width, y+height)], outline="red", width=2)
 
 	string = config["filename"]
-	string = format_string(string, datetime=timeTxt, surfaceName=surfaceName)
+	string = utils.format_string(string, datetime=timeTxt, surfaceName=surfaceName)
 	imagePath = f"images/{string}.png"
-	mkdirs( os.path.dirname(imagePath) ) # Make the folders
+	utils.mkdirs( os.path.dirname(imagePath) ) # Make the folders
 	image.save(imagePath)  # To save the image as a file
 	outputFiles.append(imagePath)
 	print(f"  Surface image saved to {imagePath}")
@@ -485,7 +485,7 @@ def createImages(config):
 
 		endTime = time.time()
 		deltaTime = endTime - startTime
-		timeString = unixDurationToText(deltaTime)
+		timeString = utils.unixDurationToText(deltaTime)
 		print(f"Planet done in {timeString}\n")
 
 
@@ -552,105 +552,10 @@ def startServer():
 		}, file, default_flow_style=False)
 
 
-""" UTILITY FUNCTIONS """
-def getRunType():
-	"""
-	Get the run type of the system.
-	Options include
-	 - windows
-	 - linux
-	 - nixos
-	 - unknown
-	"""
-	if platform.system() == "Windows":
-		return "windows"
-	
-	if platform.system() == "Linux":
-		if "NixOS" in platform.version():
-			return "nixos"
-		return "linux"
-	# print(platform.system())
-	# print(platform.version())
-	return "unknown"
-
-
-def format_string(s, **kwargs):
-	return s.format(**kwargs)
-
-
-def mkdirs(directory_path):
-	try:
-		os.makedirs(directory_path)
-	except FileExistsError:
-		pass
-
-
-def unixDurationToText(unix_seconds):
-	"""
-	Converts a unix time int to a human readable string
-	"""
-	seconds = unix_seconds
-	minutes = unix_seconds/60
-	hours = minutes/60
-	days = hours/24
-	years = days/365
-
-	text = ""
-
-	if hours >= 1: text += f"{hours:<.0f} hours & "
-	if minutes >= 1 and days < 1:
-		num = (hours % 1) * 60
-		text += f"{num:<.0f} minutes & "
-	if seconds >= 1 and hours < 1:
-		num = (minutes % 1) * 60
-		text += f"{num:<.0f} seconds & "
-	return text[0:-3]
-
-
-def match(entity, colorCode):
-	name = entity["name"]
-	func = "EXACT"
-	if "func" in colorCode:
-		func = colorCode["func"]
-	
-	# Check all names
-	for ccName in colorCode["names"]:
-		# Handle functions
-		match func:
-			case "EXACT": 
-				if name == ccName: return True
-			case "IN": 
-				if ccName in name: return True
-	return False
-
-
-def getAspect(width, height):
-	"""
-	Grabs the aspect ratio of the screen
-	"""
-	width = int(width)
-	height = int(height)
-	# Calculate the greatest common divisor of the width and height
-	gcd_value = math.gcd(width, height)
-
-	# Simplify the aspect ratio
-	aspect_ratio_width = width // gcd_value
-	aspect_ratio_height = height // gcd_value
-
-	return aspect_ratio_width, aspect_ratio_height
-
-
-def getFileHash(filePath):
-	algorithm = 'sha256'
-	func = hashlib.new(algorithm)
-	
-	with open(filePath, 'rb') as f:
-		while chunk := f.read(8192):
-			func.update(chunk)
-					
-	return func.hexdigest()
-
 def processCommand():
+	"""
+	Processes the command arguments
+	"""
 	# Initialize parser
 	parser = argparse.ArgumentParser()
 
@@ -674,6 +579,7 @@ def processCommand():
 
 	if args.output_path:
 		configOverride["backgrounds-folder"] = args.output_path
+
 
 """ MAIN ENTRY """
 startTime = time.time()
@@ -728,7 +634,7 @@ localSavePath = f"factorio-save/{config['factorio-save-name']}.zip"
 # Check if this save has already ran (no need to fetch new)
 useServer = True # Run the server to generate the map
 lrFilePath = "lastrun.yaml"
-saveFileHash = getFileHash(localSavePath)
+saveFileHash = utils.getFileHash(localSavePath)
 if os.path.exists(lrFilePath):
 	with open(lrFilePath, 'r') as file:
 		data = yaml.safe_load(file)
@@ -771,5 +677,5 @@ if "backgrounds-folder" in config:
 
 endTime = time.time()
 deltaTime = endTime - startTime
-timeString = unixDurationToText(deltaTime)
+timeString = utils.unixDurationToText(deltaTime)
 print(f"Job done in {timeString}")
