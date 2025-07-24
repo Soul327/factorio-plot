@@ -1,0 +1,9 @@
+services:
+  factorio-plot:
+    image: factorio-plot
+    volumes:
+      - "$HOME/.factorio/saves:/factorio-saves" # Path to factorio saves
+      - ".:/app"
+    stdin_open: true
+    tty: true
+    restart: "no"

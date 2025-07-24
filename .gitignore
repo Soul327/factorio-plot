@@ -1,6 +1,7 @@
 factorio.tar.xz
 info.md
 config.yaml
+__pycache__
 /lastrun.yaml
 
 /example-images
@@ -8,3 +9,4 @@ config.yaml
 /factorio
 /factorio-save/*
 /images/*
+/scripts

@@ -600,8 +600,6 @@ with open('config.yaml', 'r') as f:
 	config = yaml.safe_load(f)
 config = {**config, **configOverride}
 
-print(config)
-
 if "auto-generated" in config and config["auto-generated"] == True:
 	print("Please verify in config.yaml that the settings are correct. Then change auto-generated to False and run again.")
 	exit()
@@ -615,19 +613,21 @@ timeTxt = timeObj.strftime("%Y-%m-%d %H:%M")
 
 
 # Copy our save
-if "factorio-save-path" in config:
-	# Make sure our copy dst exists
-	tmpSaveFolder = "factorio-save"
-	if not os.path.exists(tmpSaveFolder):
-		os.makedirs(tmpSaveFolder)
+if "factorio-save-path" not in config:
+	config["factorio-save-path"] = "/factorio-saves"
 
-	# Move our files
-	factorioSavePath = os.path.expanduser( config["factorio-save-path"] + "/" + config["factorio-save-name"] + ".zip" )
-	if os.path.exists(factorioSavePath) == False:
-		print(f"Looking for save at {factorioSavePath}\nThe save '{config['factorio-save-name']}' does not exist in the directory '{config['factorio-save-path']}'. Exiting")
-		exit()
-	print(f"Copying our Factorio save file '{factorioSavePath}'")
-	shutil.copy(factorioSavePath, tmpSaveFolder+"/")
+# Make sure our copy dst exists
+tmpSaveFolder = "factorio-save"
+if not os.path.exists(tmpSaveFolder):
+	os.makedirs(tmpSaveFolder)
+
+# Move our files
+factorioSavePath = os.path.expanduser( config["factorio-save-path"] + "/" + config["factorio-save-name"] + ".zip" )
+if os.path.exists(factorioSavePath) == False:
+	print(f"Looking for save at {factorioSavePath}\nThe save '{config['factorio-save-name']}' does not exist in the directory '{config['factorio-save-path']}'. Exiting")
+	exit()
+print(f"Copying our Factorio save file '{factorioSavePath}'")
+shutil.copy(factorioSavePath, tmpSaveFolder+"/")
 localSavePath = f"factorio-save/{config['factorio-save-name']}.zip"
 
 

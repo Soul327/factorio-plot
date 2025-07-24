@@ -5,17 +5,13 @@ A tool for turning Factorio maps in to pictures. Allows you to configure custom 
 
 Inspired by [Drawscape Factorio](https://github.com/drawscape-labs/drawscape-factorio).
 
-# Installation
-1. Download the repo from GitHub `wget https://github.com/walter-ozmore/factorio-plot/archive/refs/heads/main.zip -O factorio-plot`.
-2. Unzip the repo and navigate to it `unzip factorio-plot && cd factorio-plot-main`.
-3. Run the sh file `./start.sh`.
+# Docker Installation
+Build the container with `docker build -t factorio-plot .`
 
-# Common issues
-__Error__
-`./start.sh: line 14: venv/bin/activate: No such file or directory`
-<br/>
-__Solution__
-Delete the `venv` folder in the directory.
+Run the container with `docker compose up`
+
+You can edit the factorio save location in the `compose.yaml` file.
+
 
 # Customization
 The customization is done using the `config.yaml` and a shaders `.yaml` file. Please see below for more information.
