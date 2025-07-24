@@ -7,6 +7,9 @@ import argparse
 import platform
 import utils
 
+"""
+Handles loading animations for the terminal
+"""
 class LoadingManager:
 	def __init__(self, text):
 		self.text = text
