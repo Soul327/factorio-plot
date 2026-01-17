@@ -1,6 +1,6 @@
 services:
   factorio-plot:
-    image: factorio-plot
+    image: factorio-plot:local
     volumes:
       - "$HOME/.factorio/saves:/factorio-saves" # Path to factorio saves
       - ".:/app"

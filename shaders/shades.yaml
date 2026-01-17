@@ -20,6 +20,8 @@ group:
       - oil-refinery
       - biolab
       - foundry
+      - solar-panel
+      - land-mines
   robots:
     names: [construction-robot, logistics-robot]
   short-transport:

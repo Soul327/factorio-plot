@@ -21,5 +21,4 @@ RUN pip3 install -r requirements.txt --break-system-packages && \
     rm -r /app/*
 
 # Set default command
-CMD ["python3", "main.py"]
-# CMD ["ls"]
+CMD ["python3", "docker-main.py"]

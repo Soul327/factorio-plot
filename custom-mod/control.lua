@@ -22,7 +22,8 @@ function processPlanetChunk(surface, chunkX, chunkY)
 				local exportTile = {
 						name = tile.name,
 						x = tile.position.x,
-						y = tile.position.y
+						y = tile.position.y,
+						type = "TILE"
 				}
 				table.insert(exportTiles, exportTile)
 			end
@@ -37,6 +38,7 @@ function processPlanetChunk(surface, chunkX, chunkY)
 			name = entity.name,
 			x = entity.position.x,
 			y = entity.position.y,
+			type = "ENTITY"
 		}
 		table.insert(exportEntities, exportEntity)
 	end
@@ -49,7 +51,7 @@ function processPlanetChunk(surface, chunkX, chunkY)
 	}
 
 
-	filePath = string.format("%s (%d,%d).json", surface, chunkX, chunkY)
+	filePath = string.format("%s/%dx%d.json", surface, chunkX, chunkY)
 	helpers.write_file(filePath,
 		helpers.table_to_json(data),
 		false, 0

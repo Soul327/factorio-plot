@@ -6,7 +6,7 @@ A tool for turning Factorio maps in to pictures. Allows you to configure custom 
 Inspired by [Drawscape Factorio](https://github.com/drawscape-labs/drawscape-factorio).
 
 # Docker Installation
-Build the container with `docker build -t factorio-plot .`
+Build the container with `docker build -t factorio-plot:local .`
 
 Run the container with `docker compose up`
 

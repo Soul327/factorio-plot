@@ -13,4 +13,4 @@ auto-update-server: True # Always pull the newest server from factorio.com
 chunk-size: 512 # Number of tiles per chunk
 scan-range: 2 # Radius of chunks to be scanned
 
-factorio-save-name: Space Run
+factorio-save-name: Space Age
