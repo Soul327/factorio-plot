@@ -1,5 +1,6 @@
 factorio.tar.xz
 info.md
+log-factorio.txt
 config.yaml
 __pycache__
 /lastrun.yaml
