@@ -344,8 +344,8 @@ def collectServerData():
 		
 		# Decode the output from bytes to string
 		output_str = output_data.decode('utf-8')
-		with open('log-factorio.txt', 'a') as file:
-			file.write(output_str)
+		# with open('log-factorio.txt', 'a') as file:
+		# 	file.write(output_str)
 
 		totalOutput += output_str
 
@@ -666,9 +666,9 @@ useServer = useServer()
 print(useServer)
 if useServer: collectServerData()
 
-# drawImage("aquilo")
-# drawImage("fulgora")
-# drawImage("gleba")
+drawImage("aquilo")
+drawImage("fulgora")
+drawImage("gleba")
 drawImage("nauvis")
 drawImage("vulcanus")
 
